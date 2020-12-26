@@ -37,9 +37,6 @@ def create_app(test_config=None):
 
     @app.route('/categories')
     def get_categories():
-        '''
-        GET requests for all available categories.
-        '''
         categories = Category.query.order_by('id').all()
         formatted_categories = [catagory.format()
                                 for catagory in categories]
@@ -68,20 +65,39 @@ def create_app(test_config=None):
     Clicking on the page numbers should update the questions. 
     '''
 
-    '''
-    @TODO: 
-    Create an endpoint to DELETE question using a question ID. 
+    @app.route('/questions/<question_id>', methods=['DELETE'])
+    def delete_question(question_id):
+        question = Question.query.get(question_id)
+        if question is None:
+            abort(404)
+        question.delete()
 
+        return jsonify({
+            'success': True,
+            'deleted': question_id
+        })
+
+    '''
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page. 
     '''
 
-    '''
-    @TODO: 
-    Create an endpoint to POST a new question, 
-    which will require the question and answer text, 
-    category, and difficulty score.
+    @app.route('/questions/create', methods=['POST'])
+    def create_question():
+        body = request.get_json()
+        title = body['question']
+        answer = body['answer']
+        category = int(body['category'])
+        score = int(body['score'])
 
+        question = Question(title, answer, category, score)
+        question.insert()
+
+        return jsonify({
+            'success': True,
+            'question_id': question.id
+        })
+    '''
     TEST: When you submit a question on the "Add" tab, 
     the form will clear and the question will appear at the end of the last page
     of the questions list in the "List" tab.  
