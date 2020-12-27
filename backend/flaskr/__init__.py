@@ -103,21 +103,39 @@ def create_app(test_config=None):
     of the questions list in the "List" tab.  
     '''
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions based on a search term. 
-    It should return any questions for whom the search term 
-    is a substring of the question. 
+    @app.route('/questions/search', methods=['POST'])
+    def get_questions_start_with():
+        body = request.get_json()
+        search = body.get('search')
 
+        search_query = Question.query.order_by('id').filter(
+            Question.question.ilike(f'%{search}%'))
+
+        formatted_search = [question.format() for question in search_query]
+
+        return jsonify({
+            'success': True,
+            'questions': formatted_search
+        })
+
+    '''
     TEST: Search by any phrase. The questions list will update to include 
     only question that include that string within their question. 
     Try using the word "title" to start. 
     '''
 
-    '''
-    @TODO: 
-    Create a GET endpoint to get questions based on category. 
+    @app.route('/questions/search/<category_id>')
+    def get_questions_in_category(category_id):
+        questions = Question.query.filter(
+            Question.category == category_id).all()
+        formatted_questions = [question.format() for question in questions]
 
+        return jsonify({
+            'success': True,
+            'questions': formatted_questions
+        })
+
+    '''
     TEST: In the "List" tab / main screen, clicking on one of the 
     categories in the left column will cause only questions of that 
     category to be shown. 
