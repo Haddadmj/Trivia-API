@@ -40,6 +40,9 @@ def create_app(test_config=None):
         categories = Category.query.order_by('id').all()
         formatted_categories = [catagory.format()
                                 for catagory in categories]
+        if len(formatted_categories) == 0:
+            abort(404)
+
         return jsonify({
             'success': True,
             'catagories': formatted_categories
@@ -50,6 +53,10 @@ def create_app(test_config=None):
         questions = Question.query.order_by(Question.id).all()
         current_questions = paginate_questions(request, questions)
         categories = Category.query.order_by(Category.id).all()
+
+        if len(current_questions) == 0:
+            abort(404)
+
         return jsonify({
             'success': True,
             'questions': current_questions,
@@ -67,9 +74,12 @@ def create_app(test_config=None):
 
     @app.route('/questions/<question_id>', methods=['DELETE'])
     def delete_question(question_id):
+
         question = Question.query.get(question_id)
+
         if question is None:
             abort(404)
+
         question.delete()
 
         return jsonify({
@@ -90,6 +100,9 @@ def create_app(test_config=None):
         category = int(body['category'])
         score = int(body['score'])
 
+        if body is None:
+            abort(422)
+
         question = Question(title, answer, category, score)
         question.insert()
 
@@ -108,10 +121,16 @@ def create_app(test_config=None):
         body = request.get_json()
         search = body.get('search')
 
+        if body:
+            abort(422)
+
         search_query = Question.query.order_by('id').filter(
             Question.question.ilike(f'%{search}%'))
 
         formatted_search = [question.format() for question in search_query]
+
+        if len(formatted_search) == 0:
+            abort(404)
 
         return jsonify({
             'success': True,
@@ -129,6 +148,9 @@ def create_app(test_config=None):
         questions = Question.query.filter(
             Question.category == category_id).all()
         formatted_questions = [question.format() for question in questions]
+
+        if len(formatted_questions) == 0:
+            abort(404)
 
         return jsonify({
             'success': True,
@@ -153,10 +175,28 @@ def create_app(test_config=None):
     and shown whether they were correct or not. 
     '''
 
-    '''
-    @TODO: 
-    Create error handlers for all expected errors 
-    including 404 and 422. 
-    '''
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "Resource Not Found"
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "Unprocessable"
+        }), 422
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "Bad Request"
+        }), 400
 
     return app
