@@ -148,12 +148,7 @@ def create_app(test_config=None):
     Try using the word "title" to start. 
     '''
 
-<<<<<<< HEAD
     @app.route('/categories/<category_id>/questions')
-=======
-    # GET request return questions in category given category id
-    @app.route('/questions/search/<category_id>')
->>>>>>> 35fca05dc14db59aabf45d7cba1f712e262a2549
     def get_questions_in_category(category_id):
         questions = Question.query.filter(
             Question.category == category_id).all()
