@@ -35,6 +35,7 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
+    # GET request to get all categories
     @app.route('/categories')
     def get_categories():
         categories = Category.query.order_by('id').all()
@@ -48,6 +49,7 @@ def create_app(test_config=None):
             'catagories': formatted_categories
         })
 
+    # GET request to get all questions
     @app.route('/questions')
     def get_questions():
         questions = Question.query.order_by(Question.id).all()
@@ -72,6 +74,7 @@ def create_app(test_config=None):
     Clicking on the page numbers should update the questions. 
     '''
 
+    # DELETE request to delete question given id
     @app.route('/questions/<question_id>', methods=['DELETE'])
     def delete_question(question_id):
 
@@ -92,6 +95,7 @@ def create_app(test_config=None):
     This removal will persist in the database and when you refresh the page. 
     '''
 
+    # POST request to create question given question,answer,category id,difficulty
     @app.route('/questions/create', methods=['POST'])
     def create_question():
         body = request.get_json()
@@ -116,6 +120,7 @@ def create_app(test_config=None):
     of the questions list in the "List" tab.  
     '''
 
+    # GET request to search for question given search term
     @app.route('/questions/search', methods=['POST'])
     def get_questions_start_with():
         body = request.get_json()
@@ -143,7 +148,12 @@ def create_app(test_config=None):
     Try using the word "title" to start. 
     '''
 
+<<<<<<< HEAD
     @app.route('/categories/<category_id>/questions')
+=======
+    # GET request return questions in category given category id
+    @app.route('/questions/search/<category_id>')
+>>>>>>> 35fca05dc14db59aabf45d7cba1f712e262a2549
     def get_questions_in_category(category_id):
         questions = Question.query.filter(
             Question.category == category_id).all()
