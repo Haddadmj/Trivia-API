@@ -143,7 +143,7 @@ def create_app(test_config=None):
     Try using the word "title" to start. 
     '''
 
-    @app.route('/questions/search/<category_id>')
+    @app.route('/categories/<category_id>/questions')
     def get_questions_in_category(category_id):
         questions = Question.query.filter(
             Question.category == category_id).all()
@@ -198,5 +198,21 @@ def create_app(test_config=None):
             "error": 400,
             "message": "Bad Request"
         }), 400
+
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({
+            "success": False,
+            "error": 405,
+            "message": "Method Not Allowed"
+        }), 405
+
+    @app.errorhandler(500)
+    def internal_server(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": "Internal Server Error"
+        }), 500
 
     return app
