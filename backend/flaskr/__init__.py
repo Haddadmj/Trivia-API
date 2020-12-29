@@ -46,7 +46,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'catagories': formatted_categories
+            'categories': formatted_categories
         })
 
     # GET request to get all questions
