@@ -39,8 +39,8 @@ def create_app(test_config=None):
     @app.route('/categories')
     def get_categories():
         categories = Category.query.order_by('id').all()
-        formatted_categories = [catagory.format()
-                                for catagory in categories]
+        formatted_categories = {
+            category.id: category.type for category in categories}
         if len(formatted_categories) == 0:
             abort(404)
 
@@ -99,15 +99,15 @@ def create_app(test_config=None):
     @app.route('/questions/create', methods=['POST'])
     def create_question():
         body = request.get_json()
-        title = body['question']
+        question = body['question']
         answer = body['answer']
         category = int(body['category'])
-        score = int(body['score'])
+        difficulty = int(body['difficulty'])
 
         if body is None:
             abort(422)
 
-        question = Question(title, answer, category, score)
+        question = Question(question, answer, category, difficulty)
         question.insert()
 
         return jsonify({
