@@ -98,19 +98,19 @@ curl localhost:5000/questions X
   "total_questions": 19
 }
 
-curl -X DELETE localhost:5000/questions/19
+curl -X DELETE localhost:5000/questions/19 X
 {
   "deleted": "19", 
   "success": true
 }
 
-curl -X POST localhost:5000/questions/create -H 'Content-Type: application/json' -d '{"question":"What is the dev name?","answer":"Mohammad","category":"4","difficulty":"3"}'
+curl -X POST localhost:5000/questions/create -H 'Content-Type: application/json' -d '{"question":"What is the dev name?","answer":"Mohammad","category":4,"difficulty":5}' X
 {
-  "question_id": 20, 
+  "question_id": 23,
   "success": true
 }
 
-curl -X POST localhost:5000/questions/search -H 'Content-Type: application/json' -d '{"search":"box"}'
+curl -X POST localhost:5000/questions/search -H 'Content-Type: application/json' -d '{"search":"box"}' X
 {
   "questions": [
     {
@@ -124,7 +124,7 @@ curl -X POST localhost:5000/questions/search -H 'Content-Type: application/json'
   "success": true
 }
 
-curl localhost:5000/categories/4/questions
+curl localhost:5000/categories/4/questions X
 {
   "current_category": "History", 
   "questions": [

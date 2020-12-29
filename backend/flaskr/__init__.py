@@ -15,9 +15,8 @@ def paginate_questions(request, selection):
     end = start + QUESTIONS_PER_PAGE
 
     questions = [question.format() for question in selection]
-    current_questions = questions[start:end]
 
-    return current_questions
+    return questions[start:end]
 
 
 def create_app(test_config=None):
@@ -41,6 +40,7 @@ def create_app(test_config=None):
         categories = Category.query.order_by('id').all()
         formatted_categories = {
             category.id: category.type for category in categories}
+
         if len(formatted_categories) == 0:
             abort(404)
 
@@ -90,49 +90,58 @@ def create_app(test_config=None):
     def create_question():
         body = request.get_json()
 
-        if len(body) == 0:
-            abort(422)
-        
-        question = body['question']
-        answer = body['answer']
-        category = int(body['category'])
-        difficulty = int(body['difficulty'])
-
-        if (question is None) or (answer is None) or (category is None) or (difficulty is None):
+        if body is None:
             abort(422)
 
-        question = Question(question, answer, category, difficulty)
-        question.insert()
+        try:
+            question = body['question']
+            answer = body['answer']
+            category = body['category']
+            difficulty = body['difficulty']
 
-        return jsonify({
-            'success': True,
-            'question_id': question.id
-        })
+            for x in body:
+                print(type(body[x]))
+
+            newQuestion = Question(question, answer, category, difficulty)
+
+            newQuestion.insert()
+
+            return jsonify({
+                'success': True,
+                'question_id': newQuestion.id
+            })
+
+        except:
+            abort(422)
 
     # GET request to search for question given search term
     @app.route('/questions/search', methods=['POST'])
     def get_questions_start_with():
         body = request.get_json()
-        search = body.get('search')
 
         if body is None:
             abort(422)
 
-        search_query = Question.query.order_by('id').filter(
-            Question.question.ilike(f'%{search}%'))
+        try:
+            search = body.get('search')
+            search_query = Question.query.order_by('id').filter(
+                Question.question.ilike(f'%{search}%'))
 
-        formatted_search = [question.format() for question in search_query]
+            formatted_search = [question.format() for question in search_query]
 
-        if len(formatted_search) == 0:
-            abort(404)
+            if len(formatted_search) == 0:
+                abort(404)
 
-        return jsonify({
-            'success': True,
-            'questions': formatted_search
-        })
+            return jsonify({
+                'success': True,
+                'questions': formatted_search
+            })
+        except:
+            abort(422)
 
     @app.route('/categories/<category_id>/questions')
     def get_questions_in_category(category_id):
+
         questions = Question.query.filter(
             Question.category == category_id).all()
         formatted_questions = [question.format() for question in questions]
@@ -155,32 +164,31 @@ def create_app(test_config=None):
         if body is None:
             abort(422)
 
-        prev = body.get('previous_questions')
-        quiz_category = int(body.get('quiz_category')['id'])
+        try:
+            prev = body['previous_questions']
+            quiz_category = body['quiz_category']['id']
 
-        if (prev is None) or (quiz_category is None):
-            abort(400)
+            print(prev)
 
-        if quiz_category == 0:
-            questions = Question.query.all()
-            question = questions[random.randrange(0, len(questions))]
-            if question.id in prev:
+            if quiz_category == 0:
+                questions = Question.query.all()
                 question = questions[random.randrange(0, len(questions))]
-            if len(prev) == len(questions):
-                question = None
-        else:
-            questions = Question.query.filter(
-                Question.category == quiz_category).all()
-            question = questions[random.randrange(0, len(questions))]
-            if question.id in prev:
+                if question.id in prev:
+                    question = questions[random.randrange(0, len(questions))]
+            else:
+                questions = Question.query.filter(
+                    Question.category == quiz_category).all()
                 question = questions[random.randrange(0, len(questions))]
-            if len(prev) == len(questions):
-                question = None
+                if question.id in prev:
+                    question = questions[random.randrange(0, len(questions))]
 
-        return jsonify({
-            'success': True,
-            'question': question.format()
-        })
+            return jsonify({
+                'success': True,
+                'question': question.format()
+            })
+
+        except:
+            abort(422)
 
     '''
     TEST: In the "Play" tab, after a user selects "All" or a category,
