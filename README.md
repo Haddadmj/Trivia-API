@@ -1,6 +1,6 @@
 # Udacitrivia
 
-Udacitrivia is webside backed by restful API, allow the user to do the list below 
+Udacitrivia is website backed by restful API, allow the user to do the list below 
 
 1) Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer. 
 2) Delete questions.
