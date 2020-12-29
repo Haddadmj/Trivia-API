@@ -24,7 +24,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     setup_db(app)
 
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    CORS(app, resources={r"*/api/*": {"origins": "*"}})
 
     @app.after_request
     def after_request(response):
@@ -34,7 +34,10 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
-    # GET request to get all categories
+    '''
+    Get request to get categories
+    Request Response : 'success','categories' formatted as key:value pair
+    '''
     @app.route('/categories')
     def get_categories():
         categories = Category.query.order_by('id').all()
@@ -49,12 +52,17 @@ def create_app(test_config=None):
             'categories': formatted_categories
         })
 
-    # GET request to get all questions
+    '''
+    Get request to get questions
+    Request Response : 'success','questions'
+    '''
     @app.route('/questions')
     def get_questions():
         questions = Question.query.all()
         current_questions = paginate_questions(request, questions)
         categories = Category.query.order_by(Category.id).all()
+        formatted_categories = {
+            category.id: category.type for category in categories}
 
         if len(current_questions) == 0:
             abort(404)
@@ -62,13 +70,14 @@ def create_app(test_config=None):
         return jsonify({
             'success': True,
             'questions': current_questions,
-            'categories': {category.id: category.type for category in categories},
+            'categories': formatted_categories,
             'total_questions': len(questions),
             'current_catagory': None
         })
-
-    # DELETE request to delete question given id
-
+    '''
+    DELETE request to delete question given ID
+    Request Response : 'success','deleted_id'
+    '''
     @app.route('/questions/<question_id>', methods=['DELETE'])
     def delete_question(question_id):
 
@@ -81,11 +90,13 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'deleted': question_id
+            'deleted_id': question_id
         })
-
-    # POST request to create question given question,answer,category id,difficulty
-
+    '''
+    POST request to create question
+    Request Body: question,answer,category id,difficulty
+    Request Response : 'success','question_id'
+    '''
     @app.route('/questions/create', methods=['POST'])
     def create_question():
         body = request.get_json()
@@ -111,10 +122,13 @@ def create_app(test_config=None):
                 'question_id': newQuestion.id
             })
 
-        except:
+        except Exception:
             abort(422)
-
-    # GET request to search for question given search term
+    '''
+    POST request to search question
+    Request Body: search
+    Request Response : 'success','questions'
+    '''
     @app.route('/questions/search', methods=['POST'])
     def get_questions_start_with():
         body = request.get_json()
@@ -136,9 +150,12 @@ def create_app(test_config=None):
                 'success': True,
                 'questions': formatted_search
             })
-        except:
+        except Exception:
             abort(422)
-
+    '''
+    Get request to get questions in certin category
+    Request Response : 'success','questions'
+    '''
     @app.route('/categories/<category_id>/questions')
     def get_questions_in_category(category_id):
 
@@ -155,7 +172,12 @@ def create_app(test_config=None):
             'total_questions': len(formatted_questions),
             'current_category': Category.query.get(category_id).type
         })
-
+    '''
+    POST request get questions to play the quiz
+    Request Body: previous_questions, quiz_category
+    Request Response : 'success','questions'
+    where question is not repeated
+    '''
     @app.route('/quizzes', methods=['POST'])
     def play_quiz():
 
@@ -187,14 +209,8 @@ def create_app(test_config=None):
                 'question': question.format()
             })
 
-        except:
+        except Exception:
             abort(422)
-
-    '''
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not. 
-    '''
 
     @app.errorhandler(404)
     def not_found(error):
