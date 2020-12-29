@@ -36,6 +36,8 @@ With Postgres running, restore a database using the trivia.psql file provided. F
 psql trivia < trivia.psql
 ```
 
+Note : change the owner in file trivia.psql before you dump its content to the DB
+
 ## Running the server
 
 From within the `backend` directory first ensure you are working using your created virtual environment.
@@ -46,6 +48,8 @@ To run the server, execute:
 export FLASK_APP=flaskr
 export FLASK_ENV=development
 flask run
+
+or use the one line command below
 
 FLASK_APP=flaskr FLASK_ENV=development flask run
 ```
