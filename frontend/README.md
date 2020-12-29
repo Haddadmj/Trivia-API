@@ -33,4 +33,5 @@ npm start
 
 ## Game Play Mechanics
 
-Currently, when a user plays the game they play up to five questions of the chosen category. If there are fewer than five questions in a category, the game will end when there are no more questions in that category. 
+Currently, when a user plays the game they play up to ten questions of the chosen category.</br>
+If there are fewer than ten questions in a category, the game will end when there are no more questions in that category. "WIP"
