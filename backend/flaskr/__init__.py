@@ -89,12 +89,16 @@ def create_app(test_config=None):
     @app.route('/questions/create', methods=['POST'])
     def create_question():
         body = request.get_json()
+
+        if len(body) == 0:
+            abort(422)
+        
         question = body['question']
         answer = body['answer']
         category = int(body['category'])
         difficulty = int(body['difficulty'])
 
-        if body is None:
+        if (question is None) or (answer is None) or (category is None) or (difficulty is None):
             abort(422)
 
         question = Question(question, answer, category, difficulty)
