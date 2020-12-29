@@ -24,7 +24,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     setup_db(app)
 
-    CORS(app, resources={r"*/api/*": {"origins": "*"}})
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     @app.after_request
     def after_request(response):
@@ -110,9 +110,6 @@ def create_app(test_config=None):
             category = body['category']
             difficulty = body['difficulty']
 
-            for x in body:
-                print(type(body[x]))
-
             newQuestion = Question(question, answer, category, difficulty)
 
             newQuestion.insert()
@@ -122,7 +119,7 @@ def create_app(test_config=None):
                 'question_id': newQuestion.id
             })
 
-        except Exception:
+        except:
             abort(422)
     '''
     POST request to search question
@@ -150,7 +147,7 @@ def create_app(test_config=None):
                 'success': True,
                 'questions': formatted_search
             })
-        except Exception:
+        except:
             abort(422)
     '''
     Get request to get questions in certin category
@@ -187,29 +184,26 @@ def create_app(test_config=None):
             abort(422)
 
         try:
-            prev = body['previous_questions']
+            previous_questions = body['previous_questions']
             quiz_category = body['quiz_category']['id']
-
-            print(prev)
 
             if quiz_category == 0:
                 questions = Question.query.all()
                 question = questions[random.randrange(0, len(questions))]
-                if question.id in prev:
-                    question = questions[random.randrange(0, len(questions))]
             else:
                 questions = Question.query.filter(
                     Question.category == quiz_category).all()
                 question = questions[random.randrange(0, len(questions))]
-                if question.id in prev:
-                    question = questions[random.randrange(0, len(questions))]
+
+            while question.id in previous_questions:
+                question = questions[random.randrange(0, len(questions))]
 
             return jsonify({
                 'success': True,
                 'question': question.format()
             })
 
-        except Exception:
+        except:
             abort(422)
 
     @app.errorhandler(404)
