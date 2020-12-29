@@ -17,7 +17,7 @@ To Use this project, clone it first, then follow the guide for each end, [backen
 
 The `./backend` directory contains a completed Flask and SQLAlchemy server.
 [View the README.md within ./backend for more details.](./backend/README.md)</br>
-[View the API within ./backend](./backend/API.md)
+[View the API within ./backend](./backend/API_Docs.md)
 
 ### Frontend
 
