@@ -126,7 +126,7 @@ def create_app(test_config=None):
         body = request.get_json()
         search = body.get('search')
 
-        if body:
+        if body is None:
             abort(422)
 
         search_query = Question.query.order_by('id').filter(
@@ -159,7 +159,9 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'questions': formatted_questions
+            'questions': formatted_questions,
+            'total_questions': len(formatted_questions),
+            'current_category': Category.query.get(category_id).type
         })
 
     '''
