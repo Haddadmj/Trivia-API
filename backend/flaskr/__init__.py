@@ -52,7 +52,7 @@ def create_app(test_config=None):
     # GET request to get all questions
     @app.route('/questions')
     def get_questions():
-        questions = Question.query.order_by(Question.id).all()
+        questions = Question.query.all()
         current_questions = paginate_questions(request, questions)
         categories = Category.query.order_by(Category.id).all()
 
@@ -67,14 +67,8 @@ def create_app(test_config=None):
             'current_catagory': None
         })
 
-    '''
-    TEST: At this point, when you start the application
-    you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
-    Clicking on the page numbers should update the questions. 
-    '''
-
     # DELETE request to delete question given id
+
     @app.route('/questions/<question_id>', methods=['DELETE'])
     def delete_question(question_id):
 
@@ -90,12 +84,8 @@ def create_app(test_config=None):
             'deleted': question_id
         })
 
-    '''
-    TEST: When you click the trash icon next to a question, the question will be removed.
-    This removal will persist in the database and when you refresh the page. 
-    '''
-
     # POST request to create question given question,answer,category id,difficulty
+
     @app.route('/questions/create', methods=['POST'])
     def create_question():
         body = request.get_json()
@@ -114,11 +104,6 @@ def create_app(test_config=None):
             'success': True,
             'question_id': question.id
         })
-    '''
-    TEST: When you submit a question on the "Add" tab, 
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.  
-    '''
 
     # GET request to search for question given search term
     @app.route('/questions/search', methods=['POST'])
@@ -142,12 +127,6 @@ def create_app(test_config=None):
             'questions': formatted_search
         })
 
-    '''
-    TEST: Search by any phrase. The questions list will update to include 
-    only question that include that string within their question. 
-    Try using the word "title" to start. 
-    '''
-
     @app.route('/categories/<category_id>/questions')
     def get_questions_in_category(category_id):
         questions = Question.query.filter(
@@ -164,19 +143,42 @@ def create_app(test_config=None):
             'current_category': Category.query.get(category_id).type
         })
 
-    '''
-    TEST: In the "List" tab / main screen, clicking on one of the 
-    categories in the left column will cause only questions of that 
-    category to be shown. 
-    '''
+    @app.route('/quizzes', methods=['POST'])
+    def play_quiz():
+
+        body = request.get_json()
+
+        if body is None:
+            abort(422)
+
+        prev = body.get('previous_questions')
+        quiz_category = int(body.get('quiz_category')['id'])
+
+        if (prev is None) or (quiz_category is None):
+            abort(400)
+
+        if quiz_category == 0:
+            questions = Question.query.all()
+            question = questions[random.randrange(0, len(questions))]
+            if question.id in prev:
+                question = questions[random.randrange(0, len(questions))]
+            if len(prev) == len(questions):
+                question = None
+        else:
+            questions = Question.query.filter(
+                Question.category == quiz_category).all()
+            question = questions[random.randrange(0, len(questions))]
+            if question.id in prev:
+                question = questions[random.randrange(0, len(questions))]
+            if len(prev) == len(questions):
+                question = None
+
+        return jsonify({
+            'success': True,
+            'question': question.format()
+        })
 
     '''
-    @TODO: 
-    Create a POST endpoint to get questions to play the quiz. 
-    This endpoint should take category and previous question parameters 
-    and return a random questions within the given category, 
-    if provided, and that is not one of the previous questions. 
-
     TEST: In the "Play" tab, after a user selects "All" or a category,
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not. 
