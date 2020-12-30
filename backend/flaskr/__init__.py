@@ -133,22 +133,19 @@ def create_app(test_config=None):
         if body is None:
             abort(422)
 
-        try:
-            search = body.get('search')
-            search_query = Question.query.order_by('id').filter(
-                Question.question.ilike(f'%{search}%'))
+        search = body.get('search')
+        search_query = Question.query.order_by('id').filter(
+            Question.question.ilike(f'%{search}%'))
 
-            formatted_search = [question.format() for question in search_query]
+        formatted_search = [question.format() for question in search_query]
 
-            if len(formatted_search) == 0:
-                abort(404)
+        if len(formatted_search) == 0:
+            abort(404)
 
-            return jsonify({
-                'success': True,
-                'questions': formatted_search
-            })
-        except:
-            abort(422)
+        return jsonify({
+            'success': True,
+            'questions': formatted_search
+        })
     '''
     Get request to get questions in certin category
     Request Response : 'success','questions'
@@ -183,28 +180,30 @@ def create_app(test_config=None):
         if body is None:
             abort(422)
 
-        try:
-            previous_questions = body['previous_questions']
-            quiz_category = body['quiz_category']['id']
+        previous_questions = body['previous_questions']
+        quiz_category = body['quiz_category']['id']
 
-            if quiz_category == 0:
-                questions = Question.query.all()
-                question = questions[random.randrange(0, len(questions))]
-            else:
-                questions = Question.query.filter(
-                    Question.category == quiz_category).all()
-                question = questions[random.randrange(0, len(questions))]
+        if quiz_category == 0:
+            questions = Question.query.all()
+            question = questions[random.randrange(
+                0, len(questions))].format()
+        else:
+            questions = Question.query.filter(
+                Question.category == quiz_category).all()
+            question = questions[random.randrange(
+                0, len(questions))].format()
 
-            while question.id in previous_questions:
-                question = questions[random.randrange(0, len(questions))]
+        while (question['id'] in previous_questions) and (len(previous_questions) != len(questions)):
+            question = questions[random.randrange(
+                0, len(questions))].format()
 
-            return jsonify({
-                'success': True,
-                'question': question.format()
-            })
+        if len(previous_questions) == len(questions):
+            question = None
 
-        except:
-            abort(422)
+        return jsonify({
+            'success': True,
+            'question': question
+        })
 
     @app.errorhandler(404)
     def not_found(error):
