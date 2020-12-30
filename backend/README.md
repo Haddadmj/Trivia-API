@@ -298,7 +298,7 @@ The API will return three types of errors:
   * Allows users to play the quiz game.
   * Uses JSON request parameters of category and previous questions.
   * Returns JSON object with random question not among previous questions.
-* Sample: `curl -X POST localhost:5000/quizzes -H "Content-Type: application/json" -d '{"previous_questions": [1, 2],"quiz_category": {"type": "click", "id": 0}}'`<br>
+  * Sample: `curl -X POST localhost:5000/quizzes -H "Content-Type: application/json" -d '{"previous_questions": [1, 2],"quiz_category": {"type": "click", "id": 0}}'`<br>
 
         {
         "question": {
