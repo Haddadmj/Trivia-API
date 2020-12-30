@@ -33,6 +33,9 @@ class TriviaTestCase(unittest.TestCase):
             'difficulty': '5'
         }
 
+        self.testQuiz = {"previous_questions": [
+            1, 2], "quiz_category": {"type": "click", "id": 0}}
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -134,6 +137,22 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['message'], 'Resource Not Found')
+        self.assertFalse(data['success'])
+
+    def test_200_play_quiz(self):
+        res = self.client().post('/quizzes', json=self.testQuiz)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNotNone(data['question'])
+        self.assertTrue(data['success'])
+
+    def test_422_play_quiz(self):
+        res = self.client().post('/quizzes')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['message'], 'Unprocessable')
         self.assertFalse(data['success'])
 
 
