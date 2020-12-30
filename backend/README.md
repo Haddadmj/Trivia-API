@@ -300,13 +300,13 @@ The API will return three types of errors:
   * Returns JSON object with random question not among previous questions.
 * Sample: `curl -X POST localhost:5000/quizzes -H "Content-Type: application/json" -d '{"previous_questions": [1, 2],"quiz_category": {"type": "click", "id": 0}}'`<br>
 
-{
-  "question": {
-    "answer": "Mona Lisa",
-    "category": 2,
-    "difficulty": 3,
-    "id": 13,
-    "question": "La Giaconda is better known as what?"
-  },
-  "success": true
-}
+        {
+        "question": {
+            "answer": "Mona Lisa",
+            "category": 2,
+            "difficulty": 3,
+            "id": 13,
+            "question": "La Giaconda is better known as what?"
+        },
+        "success": true
+        }
